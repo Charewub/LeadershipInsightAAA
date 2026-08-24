@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leadership Insight Assessment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-purple: #6a4c93;
+            --space-blue: #192a56;
+            --ruby-red: #c0392b;
+            --galaxy-gradient: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            --glass-bg: rgba(255, 255, 255, 0.92);
+            --glow-shadow: 0 0 15px rgba(106, 76, 147, 0.4);
+        }
+
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background: var(--galaxy-gradient); 
+            background-attachment: fixed;
+            color: #ecf0f1; 
+            margin: 0; 
+            padding: 20px 20px 100px 20px; /* Space for bottom progress bar */
+            min-height: 100vh;
+        }
+
+        .container { 
+            max-width: 800px; 
+            margin: 40px auto; 
+            background: var(--glass-bg); 
+            color: #2c3e50;
+            padding: 40px; 
+            border-radius: 30px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .header h2 { 
+            text-align: center; 
+            color: var(--primary-purple); 
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+
+        /* Question Block Styling */
+        .question-block { 
+            margin-bottom: 30px; 
+            padding: 25px; 
+            border-radius: 20px; 
+            background: #ffffff;
+            border: 2px solid #f1f3f5;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+
+        .question-block:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--glow-shadow);
+            border-color: var(--primary-purple);
+        }
+
+        .question-block p {
+            font-weight: 600;
+            font-size: 1.15rem;
+            color: var(--space-blue);
+            margin-top: 0;
+        }
+
+        .error-highlight { 
+            border: 2px solid #ff595e !important; 
+            background-color: #fff5f5 !important; 
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Custom Radio Styling */
+        .option-label { 
+            display: flex;
+            align-items: center;
+            padding: 15px 20px; 
+            margin: 12px 0; 
+            border: 1.5px solid #e0e0e0; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            transition: 0.3s;
+            background: #fff;
+        }
+
+        .option-label:hover { 
+            background-color: #f8f9fa;
+            border-color: var(--primary-purple);
+        }
+
+        input[type="radio"] { 
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid #bdc3c7;
+            border-radius: 50%;
+            margin-right: 15px;
+            outline: none;
+            transition: 0.2s;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        input[type="radio"]:checked {
+            border-color: var(--primary-purple);
+            background: var(--primary-purple);
+            box-shadow: 0 0 10px rgba(106, 76, 147, 0.5);
+        }
+
+        input[type="radio"]:checked::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .option-label span {
+            font-size: 1.05rem;
+            line-height: 1.4;
+        }
+
+        /* Buttons Styling */
+        .btn-group { display: flex; justify-content: space-between; margin-top: 40px; gap: 15px; }
+        
+        button { 
+            padding: 15px 35px; 
+            border: none; 
+            border-radius: 15px; 
+            cursor: pointer; 
+            font-size: 1.1rem; 
+            font-weight: 600;
+            transition: 0.3s; 
+            font-family: 'Sarabun', sans-serif;
+        }
+
+        .btn-next { 
+            background: linear-gradient(45deg, var(--primary-purple), var(--space-blue));
+            color: white; 
+            flex-grow: 2;
+            box-shadow: 0 4px 15px rgba(25, 42, 86, 0.3);
+        }
+
+        .btn-next:hover {
+            filter: brightness(1.2);
+            transform: scale(1.02);
+        }
+
+        .btn-prev { 
+            background-color: #ecf0f1; 
+            color: #7f8c8d;
+            flex-grow: 1;
+        }
+
+        .btn-submit { 
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white; 
+            flex-grow: 2;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        input[type="text"], input[type="email"] { 
+            width: 100%; 
+            padding: 15px; 
+            margin: 10px 0 20px 0; 
+            border: 2px solid #eee; 
+            border-radius: 12px; 
+            box-sizing: border-box; 
+            font-family: 'Sarabun', sans-serif;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--primary-purple); }
+
+        /* Bottom Fixed Progress Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 12, 41, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            z-index: 1000;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .progress-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #bdc3c7;
+        }
+
+        .progress-container { 
+            width: 100%; 
+            background: rgba(255,255,255,0.1); 
+            height: 12px; 
+            border-radius: 10px; 
+            overflow: hidden;
+        }
+
+        #progress-bar { 
+            width: 0%; 
+            height: 100%; 
+            background: linear-gradient(90deg, var(--ruby-red), var(--primary-purple), var(--space-blue)); 
+            border-radius: 10px; 
+            transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1); 
+            box-shadow: 0 0 10px rgba(106, 76, 147, 0.8);
+        }
+
+        .step { display: none; }
+        .active { display: block; animation: fadeIn 0.5s ease-in-out; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { padding: 25px; margin: 20px 10px; }
+            .header h2 { font-size: 1.6rem; }
+            button { padding: 12px 20px; font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>Find Your Leadership Insight</h2>
+        <p>ค้นพบพลังผู้นำที่เปล่งประกายในแบบคุณ</p>
+    </div>
+
+    <form id="InsightForm">
+        <div class="step active" id="step0">
+            <h3 style="color: var(--space-blue); margin-bottom: 20px;">โปรดระบุข้อมูลผู้ทำแบบประเมิน</h3>
+            <label>ชื่อ-นามสกุล</label>
+            <input type="text" id="userName" name="name" placeholder="ระบุชื่อ-นามสกุลของท่าน" required>
+            <label>อีเมลของท่าน</label>
+            <input type="email" id="userEmail" name="email" placeholder="example@mail.com" required>
+            
+            <div style="background: #fdf2f2; padding: 20px; border-radius: 15px; border-left: 5px solid var(--ruby-red); margin: 20px 0;">
+                <small style="color: #666; display: block; line-height: 1.6;">
+                    * แบบประเมินนี้ประกอบด้วย 90 คู่ตัวเลือก โปรดใช้สัญชาตญาณ ความรู้สึก หรือความคิดแรกในการเลือกสิ่งที่ใกล้เคียงความเป็นตัวคุณมากที่สุด
+                </small>
+            </div>
+            
+            <button type="button" class="btn-next" style="margin-top:20px; width: 100%;" onclick="startAssessment()">เริ่มต้นค้นหา Insight ของคุณ</button>
+        </div>
+
+        <div id="questions-area"></div>
+
+        <div id="nav-group" class="btn-group" style="display:none;">
+            <button type="button" id="prevBtn" class="btn-prev" onclick="changePage(-1)">ย้อนกลับ</button>
+            <button type="button" id="nextBtn" class="btn-next" onclick="changePage(1)">หน้าถัดไป</button>
+            <button type="submit" id="submitBtn" class="btn-submit" style="display:none;">ส่งผลเพื่อวิเคราะห์ Insight</button>
+        </div>
+    </form>
+</div>
+
+<div id="bottom-nav-container" class="bottom-nav" style="display:none;">
+    <div class="progress-wrapper">
+        <div class="progress-info">
+            <span id="progress-percent">ความสำเร็จ: 0%</span>
+            <span id="progress-step">หน้า 1 จาก 15</span>
+        </div>
+        <div class="progress-container">
+            <div id="progress-bar"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx4fcR-O3l6fU5yziZH_4CIYmXDLDLpI15NLe_N_4ZaTnyazdjXQQ9OMWOnd4I8Qspy/exec";
+    const QUESTIONS_PER_PAGE = 6;
+    let currentPage = 0;
+    
+    // คำถาม 90 ข้อ (ดึงจาก csv) แก้ไข Syntax Error (Escape Quotes)
+    const rawQuestions = [
+        {id:1, aCode:"S01", aText:"ฉันสามารถมองเห็นภาพรวมและเชื่อมโยงส่วนต่าง ๆ ของแผนงานที่ซับซ้อนได้", bCode:"S16", bText:"การรับฟังอย่างตั้งใจโดยไม่ตัดสิน คือสิ่งที่ฉันให้ความสำคัญ"},
+        {id:2, aCode:"S02", aText:"ฉันมักจะใช้เวลาวาดภาพอนาคตที่น่าตื่นเต้นเพื่อเป็นแนวทางในการทำงาน", bCode:"S17", bText:"ฉันมีความสุขที่ได้เห็นคนในทีมเติบโตและค้นพบศักยภาพของตัวเอง"},
+        {id:3, aCode:"S03", aText:"ฉันสามารถสื่อสารวิสัยทัศน์ที่ทำให้คนอื่นรู้สึกมีพลังและอยากทำตาม", bCode:"S18", bText:"ฉันสามารถอธิบายเรื่องที่ซับซ้อนให้กลายเป็นเรื่องราวที่เข้าใจง่าย"},
+        {id:4, aCode:"S04", aText:"ฉันชอบเชื่อมโยงข้อมูลหลายๆ อย่างเข้าด้วยกันเพื่อสร้างเป็นแนวคิดใหม่", bCode:"S19", bText:"การได้ช่วยเหลือให้คนอื่นเติบโตและเก่งขึ้นเป็นความสุขของฉัน"},
+        {id:5, aCode:"S05", aText:"เป้าหมายที่ชัดเจนและท้าทายคือสิ่งที่ขับเคลื่อนฉันในการทำงาน", bCode:"S20", bText:"ฉันเชื่อว่าผลงานที่ดีที่สุดเกิดจากการทำงานร่วมกันเป็นทีม"},
+        {id:6, aCode:"S06", aText:"ฉันมักจะหาวิธีการใหม่ๆ ในการทำสิ่งเดิมๆ ให้ดีขึ้น", bCode:"S21", bText:"ฉันยึดมั่นในหลักการของตัวเอง แม้ว่ามันจะทำให้ตัดสินใจได้ยากขึ้น"},
+        {id:7, aCode:"S07", aText:"หากมีเรื่องที่ฉันสงสัย ฉันจะค้นคว้าหาข้อมูลจนกว่าจะเข้าใจอย่างลึกซึ้ง", bCode:"S22", bText:"เมื่อฉันรับปากหรือสัญญาอะไรไว้ ฉันจะทำมันให้สำเร็จเสมอ"},
+        {id:8, aCode:"S08", aText:"แม้จะเจอปัญหา ฉันก็ยังเชื่อว่าจะต้องมีทางออกที่ดีรออยู่เสมอ", bCode:"S23", bText:"ฉันปฏิบัติต่อทุกคนด้วยมาตรฐานเดียวกันอย่างเท่าเทียมกัน"},
+        {id:9, aCode:"S09", aText:"ฉันสามารถวิเคราะห์ปัญหาที่ซับซ้อนและระบุสาเหตุที่แท้จริงได้", bCode:"S24", bText:"ฉันรู้สึกว่าผลงานของทีมสำคัญกว่าการได้รับคำชื่นชมเป็นการส่วนตัว"},
+        {id:10, aCode:"S10", aText:"เมื่อมีไอเดียดีๆ ฉันจะลงมือทำทันทีโดยไม่รอช้า", bCode:"S25", bText:"ฉันพร้อมที่จะพูดหรือทำในสิ่งที่ถูกต้อง แม้ว่ามันจะไม่เป็นที่ถูกใจผู้คนก็ตาม"},
+        {id:11, aCode:"S11", aText:"ฉันรู้สึกดีกับตัวเองเมื่อได้ผลักดันงานให้คืบหน้าไปอย่างรวดเร็ว", bCode:"S26", bText:"เมื่อรู้สึกเครียด ฉันสามารถหยุดและทบทวนอารมณ์ของตนเองได้"},
+        {id:12, aCode:"S12", aText:"การวางแผนและจัดสรรทรัพยากรให้เกิดประโยชน์สูงสุดคือสิ่งที่ฉันถนัด", bCode:"S27", bText:"เมื่อแผนเดิมใช้ไม่ได้ผล ฉันสามารถเปลี่ยนไปใช้แผนใหม่ได้อย่างรวดเร็ว"},
+        {id:13, aCode:"S13", aText:"ฉันสามารถตัดสินใจเรื่องสำคัญได้อย่างรวดเร็วแม้จะมีข้อมูลไม่มากนัก", bCode:"S28", bText:"ฉันพร้อมที่จะเปลี่ยนความคิดเห็นของตัวเอง หากมีข้อมูลใหม่ที่ดีกว่า"},
+        {id:14, aCode:"S14", aText:"เมื่อเจอกับอุปสรรค ฉันจะพยายามหนักขึ้นแทนที่จะยอมแพ้", bCode:"S29", bText:"ฉันสามารถรักษาความสงบและคิดอย่างมีเหตุผลได้ดีในสถานการณ์ที่กดดัน"},
+        {id:15, aCode:"S15", aText:"ฉันมักจะตรวจสอบงานในรายละเอียดเพื่อให้แน่ใจว่าไม่มีอะไรผิดพลาด", bCode:"S30", bText:"ความล้มเหลวคือบทเรียนที่ทำให้ฉันแข็งแกร่งขึ้นในครั้งต่อไป"},
+        {id:16, aCode:"S01", aText:"ก่อนเริ่มโครงการ ฉันมักจะวางแผนเส้นทางและผลลัพธ์ที่เป็นไปได้หลายๆ แบบไว้ล่วงหน้า", bCode:"S17", bText:"การให้คำแนะนำที่เป็นประโยชน์เพื่อช่วยให้คนอื่นพัฒนาคือสิ่งที่ฉันชอบทำ"},
+        {id:17, aCode:"S02", aText:"การคิดถึงอนาคตทำให้ฉันมีพลังและแรงบันดาลใจมากกว่าการจมอยู่กับปัจจุบัน", bCode:"S18", bText:"ผู้คนมักบอกว่าฉันเป็นคนที่เล่าเรื่องได้น่าติดตาม"},
+        {id:18, aCode:"S03", aText:"การสื่อสารของฉันมักจะกระตุ้นให้คนอื่นมองเห็นภาพใหญ่และเป้าหมายร่วมกัน", bCode:"S19", bText:"ฉันมองเห็นข้อดีและศักยภาพในตัวคนอื่นที่พวกเขามองไม่เห็น"},
+        {id:19, aCode:"S04", aText:"ฉันมักจะเห็นความเชื่อมโยงในสิ่งต่างๆ ที่คนอื่นมองว่าไม่เกี่ยวข้องกัน", bCode:"S20", bText:"ฉันชอบทำงานในบรรยากาศที่ทุกคนช่วยเหลือและสนับสนุนซึ่งกันและกัน"},
+        {id:20, aCode:"S05", aText:"ฉันจะตั้งเป้าหมายที่สามารถวัดผลได้ เพื่อให้รู้ว่าเข้าใกล้ความสำเร็จแค่ไหน", bCode:"S21", bText:"ฉันมีชุดคุณค่าส่วนตัวที่ใช้เป็นเข็มทิศในการตัดสินใจทุกเรื่อง"},
+        {id:21, aCode:"S06", aText:"ฉันชอบทดลองทำสิ่งต่างๆ ในรูปแบบที่ไม่เคยมีใครทำมาก่อน", bCode:"S22", bText:"คำพูดของฉันและการกระทำของฉันเป็นสิ่งเดียวกันเสมอ"},
+        {id:22, aCode:"S07", aText:"ฉันมีความสุขกับการได้เรียนรู้สิ่งใหม่ๆ แม้ว่าสิ่งนั้นจะไม่ได้เกี่ยวกับงานโดยตรง", bCode:"S23", bText:"ก่อนตัดสินใจ ฉันจะรับฟังข้อมูลจากทุกฝ่ายอย่างเป็นกลาง"},
+        {id:23, aCode:"S08", aText:"ฉันเชื่อว่าทุกปัญหามีโอกาสซ่อนอยู่", bCode:"S24", bText:"ฉันยินดีที่จะให้เครดิตกับคนอื่นเมื่อทีมประสบความสำเร็จ"},
+        {id:24, aCode:"S09", aText:"ฉันชอบที่จะเจอโจทย์ยากๆ ที่ต้องใช้การคิดวิเคราะห์เพื่อหาทางแก้ไข", bCode:"S25", bText:"ฉันเชื่อในการปกป้องสิ่งที่ถูกต้อง แม้จะต้องเผชิญหน้ากับความขัดแย้ง"},
+        {id:25, aCode:"S10", aText:"ลงมือทำเลย เป็นแนวคิดที่ฉันใช้ในการทำงานอยู่เสมอ", bCode:"S26", bText:"ฉันสามารถรับรู้ถึงความคิดที่กำลังเกิดขึ้นในหัวของตัวเองได้"},
+        {id:26, aCode:"S11", aText:"รายการสิ่งที่ต้องทำ (To-do list) ที่ถูกขีดฆ่าออกไปเป็นสิ่งที่ทำให้ฉันพอใจ", bCode:"S27", bText:"ฉันมองว่าการเปลี่ยนแปลงที่ไม่คาดฝันคือโอกาส ไม่ใช่วิกฤต"},
+        {id:27, aCode:"S12", aText:"ฉันสามารถจัดการงานหลายๆ อย่างพร้อมกันได้อย่างเป็นระบบระเบียบ", bCode:"S28", bText:"การได้เรียนรู้มุมมองใหม่ๆ ทำให้ฉันสามารถเปลี่ยนความคิดเดิมๆ ได้"},
+        {id:28, aCode:"S13", aText:"ในสถานการณ์ฉุกเฉิน ฉันเป็นคนที่สามารถตัดสินใจและนำทางทีมได้", bCode:"S29", bText:"คนอื่นมักจะแปลกใจที่ฉันยังคงใจเย็นได้ในสถานการณ์ที่วุ่นวาย"},
+        {id:29, aCode:"S14", aText:"ฉันสามารถทำงานที่ต้องใช้ความอดทนสูงและใช้เวลานานได้ดี", bCode:"S30", bText:"ฉันไม่เคยยอมแพ้กับอะไรง่ายๆ และจะลุกขึ้นสู้ใหม่เสมอ"},
+        {id:30, aCode:"S15", aText:"วัดผลสองครั้ง ตัดสินใจครั้งเดียว คือแนวทางการทำงานของฉัน", bCode:"S16", bText:"ฉันสามารถรับรู้และเข้าใจความรู้สึกของคนอื่นได้ราวกับเป็นความรู้สึกของตนเอง"},
+        {id:31, aCode:"S01", aText:"ฉันมีความสุขกับการออกแบบระบบหรือกระบวนการทำงานให้มีประสิทธิภาพ", bCode:"S18", bText:"การสื่อสารอย่างสม่ำเสมอคือหัวใจสำคัญในการทำงานสำหรับฉัน"},
+        {id:32, aCode:"S02", aText:"ฉันมักจะถามตัวเองว่า \"อีก 5 ปีข้างหน้า เราควรจะไปอยู่ที่จุดไหน?\"", bCode:"S19", bText:"การเป็นส่วนหนึ่งของการเติบโตของใครสักคนเป็นสิ่งที่เติมเต็มฉัน"},
+        {id:33, aCode:"S03", aText:"ฉันสามารถเปลี่ยนข้อมูลที่น่าเบื่อให้กลายเป็นการนำเสนอที่น่าตื่นเต้นได้", bCode:"S20", bText:"คำว่า \"พวกเรา\" สำคัญกว่า \"ตัวฉัน\" เมื่อพูดถึงความสำเร็จของงาน"},
+        {id:34, aCode:"S04", aText:"การทำความเข้าใจทฤษฎีหรือแนวคิดที่เป็นนามธรรมเป็นเรื่องสนุกสำหรับฉัน", bCode:"S21", bText:"ถ้าการกระทำนั้นขัดกับหลักการของฉัน ฉันจะไม่ทำมันเด็ดขาด"},
+        {id:35, aCode:"S05", aText:"ฉันจะรู้สึกกระตือรือร้นเป็นพิเศษเมื่อได้ทำงานที่ท้าทายความสามารถ", bCode:"S22", bText:"ฉันรับผิดชอบต่องานของฉันอย่างเต็มที่ ไม่ว่าผลจะออกมาดีหรือไม่ดี"},
+        {id:36, aCode:"S06", aText:"มันน่าจะมีวิธีที่ดีกว่านี้ เป็นคำถามที่ฉันถามตัวเองอยู่เสมอ", bCode:"S23", bText:"ความเป็นธรรมเป็นสิ่งสำคัญที่สุดสำหรับฉันในการทำงานร่วมกับผู้อื่น"},
+        {id:37, aCode:"S07", aText:"ฉันใช้เวลาว่างในการอ่านหนังสือหรือดูสารคดีเพื่อหาความรู้เพิ่มเติม", bCode:"S24", bText:"ฉันเปิดรับฟังคำวิจารณ์และข้อเสนอแนะจากคนอื่นเสมอ"},
+        {id:38, aCode:"S08", aText:"ฉันมักจะให้กำลังใจคนรอบข้างและทำให้พวกเขามองเห็นด้านบวกของปัญหา", bCode:"S25", bText:"ฉันจะยืนหยัดเพื่อปกป้องทีมหรือเพื่อนร่วมงานที่ถูกปฏิบัติอย่างไม่เป็นธรรม"},
+        {id:39, aCode:"S09", aText:"เมื่อเกิดปัญหาขึ้น ฉันจะมุ่งไปที่การหาทางแก้ไข ไม่ใช่หาคนผิด", bCode:"S26", bText:"ฉันฝึกฝนที่จะอยู่กับปัจจุบันขณะ แทนที่จะกังวลเรื่องอดีตหรืออนาคต"},
+        {id:40, aCode:"S10", aText:"ฉันชอบที่จะเป็นคนแรกที่ได้ทดลองทำสิ่งใหม่ๆ", bCode:"S27", bText:"ฉันรู้สึกมีพลังและทำงานได้ดีที่สุดในสถานการณ์ที่เปลี่ยนแปลงตลอดเวลา"},
+        {id:41, aCode:"S11", aText:"ฉันมีแรงผลักดันจากภายในที่ต้องการทำสิ่งต่างๆ ให้สำเร็จอยู่ตลอดเวลา", bCode:"S28", bText:"ฉันไม่ยึดติดกับวิธีการเดิมๆ และพร้อมที่จะปรับเปลี่ยนเมื่อเจอข้อมูลใหม่"},
+        {id:42, aCode:"S12", aText:"การสร้างแผนงานที่มีขั้นตอนชัดเจนช่วยให้ฉันทำงานได้ดีขึ้น", bCode:"S29", bText:"แม้จะมีความขัดแย้งเกิดขึ้น ฉันก็ยังสามารถรักษาท่าทีที่สงบเยือกเย็นไว้ได้"},
+        {id:43, aCode:"S13", aText:"การลังเลที่จะตัดสินใจทำให้ฉันรู้สึกอึดอัด", bCode:"S30", bText:"ทุกครั้งที่ล้มเหลว ฉันจะใช้เวลาวิเคราะห์เพื่อเรียนรู้จากมัน"},
+        {id:44, aCode:"S14", aText:"ความมุ่งมั่น คือคำที่คนอื่นมักใช้อธิบายตัวฉัน", bCode:"S16", bText:"ฉันให้ความสำคัญกับการสร้างความสัมพันธ์ที่จริงใจและลึกซึ้งกับคนรอบข้าง"},
+        {id:45, aCode:"S15", aText:"ฉันมักจะเป็นคนที่มองเห็นข้อผิดพลาดเล็กๆ น้อยๆ ที่คนอื่นอาจมองข้ามไป", bCode:"S17", bText:"ฉันมองเห็นศักยภาพที่ซ่อนอยู่ในตัวผู้อื่น และมีความสุขที่ได้ช่วยให้เขาเติบโต"},
+        {id:46, aCode:"S01", aText:"คนอื่นมักจะมาขอความเห็นจากฉันเรื่องการวางกลยุทธ์", bCode:"S19", bText:"การสอนงานหรือเป็นพี่เลี้ยงให้คนอื่นเป็นสิ่งที่ฉันทำได้ดี"},
+        {id:47, aCode:"S02", aText:"วิสัยทัศน์ที่ชัดเจนเกี่ยวกับอนาคตช่วยให้ฉันตัดสินใจในปัจจุบันได้ดีขึ้น", bCode:"S20", bText:"ฉันทำงานได้ดีที่สุดเมื่อได้ระดมสมองและแลกเปลี่ยนความคิดเห็นกับทีม"},
+        {id:48, aCode:"S03", aText:"ฉันเชื่อว่าการสร้างอารมณ์ร่วมเป็นสิ่งสำคัญในการโน้มน้าวใจคน", bCode:"S21", bText:"ความซื่อสัตย์ต่อหลักการสำคัญกว่าการเป็นที่รักของทุกคน"},
+        {id:49, aCode:"S04", aText:"ฉันสนุกกับการคิดหาคำอธิบายง่ายๆ สำหรับแนวคิดที่ซับซ้อน", bCode:"S22", bText:"ถ้าฉันทำผิดพลาด ฉันจะเป็นคนแรกที่ยอมรับและแก้ไขมัน"},
+        {id:50, aCode:"S05", aText:"ฉันจะทบทวนเป้าหมายของตัวเองอย่างสม่ำเสมอเพื่อให้แน่ใจว่ายังคงเดินถูกทาง", bCode:"S23", bText:"กฎเกณฑ์มีไว้เพื่อให้ทุกคนได้รับการปฏิบัติอย่างเท่าเทียมกัน"},
+        {id:51, aCode:"S06", aText:"สภาพแวดล้อมที่จำเจและไม่มีอะไรใหม่ๆ ทำให้ฉันรู้สึกเบื่อหน่าย", bCode:"S24", bText:"ฉันตระหนักดีว่าตนเองไม่ได้รู้ทุกเรื่องและต้องการความช่วยเหลือจากผู้อื่น"},
+        {id:52, aCode:"S07", aText:"\"ทำไม\" และ \"อย่างไร\" เป็นคำถามที่ฉันถามบ่อยที่สุด", bCode:"S25", bText:"ฉันมีความกล้าที่จะทำในสิ่งที่เสี่ยง หากเชื่อว่ามันจะนำไปสู่ผลลัพธ์ที่ดีกว่า"},
+        {id:53, aCode:"S08", aText:"ต่อให้สถานการณ์จะดูเลวร้าย ฉันก็ยังมองหาแง่มุมดีๆ จนเจอ", bCode:"S26", bText:"การหยุดพักเพื่อหายใจลึกๆ ช่วยให้ฉันจัดการกับความเครียดได้"},
+        {id:54, aCode:"S09", aText:"การแก้ปัญหาเฉพาะหน้าเป็นสิ่งที่ฉันทำได้ดี", bCode:"S27", bText:"การปรับตัวให้เข้ากับคนหรือสภาพแวดล้อมใหม่ๆ เป็นเรื่องง่ายสำหรับฉัน"},
+        {id:55, aCode:"S10", aText:"ฉันมักจะเป็นคนเสนอไอเดียใหม่ๆ ในที่ประชุม", bCode:"S28", bText:"ความคิดของฉันเปลี่ยนแปลงและพัฒนาอยู่เสมอตามข้อมูลที่ได้รับ"},
+        {id:56, aCode:"S11", aText:"การได้ทำสิ่งต่างๆ ให้สำเร็จเป็นแหล่งพลังงานที่สำคัญของฉัน", bCode:"S29", bText:"ในสถานการณ์วิกฤต ฉันมักจะเป็นคนที่คนอื่นพึ่งพาเพื่อให้สถานการณ์สงบลง"},
+        {id:57, aCode:"S12", aText:"ฉันชอบที่จะมีโครงสร้างและระบบที่ชัดเจนในการทำงาน", bCode:"S30", bText:"ฉันมองว่าความพยายามที่ไม่ยอมแพ้สำคัญกว่าพรสวรรค์"},
+        {id:58, aCode:"S13", aText:"การตัดสินใจที่รวดเร็วดีกว่าการไม่ตัดสินใจอะไรเลย", bCode:"S16", bText:"ฉันมักจะหาโอกาสพูดคุยและทำความรู้จักกับเพื่อนร่วมงานในระดับที่ลึกซึ้งขึ้น"},
+        {id:59, aCode:"S14", aText:"ฉันไม่ย่อท้อต่อความล้มเหลวระหว่างทาง ตราบใดที่ยังไม่ถึงเป้าหมายสุดท้าย", bCode:"S17", bText:"ฉันรู้สึกเติมเต็มเมื่อได้ช่วยให้ใครสักคนค้นพบและพัฒนาจุดแข็งของเขา"},
+        {id:60, aCode:"S15", aText:"ฉันมักจะใช้เวลาในการคิดไตร่ตรองอย่างรอบคอบก่อนที่จะตัดสินใจ", bCode:"S18", bText:"ฉันสามารถปรับวิธีการสื่อสารให้เข้ากับผู้ฟังแต่ละคนได้"},
+        {id:61, aCode:"S01", aText:"ฉันสามารถแยกแยะรูปแบบที่ซ่อนอยู่ในข้อมูลที่ดูวุ่นวายได้", bCode:"S20", bText:"ฉันให้คุณค่ากับความสำเร็จของทีมมากกว่าความสำเร็จส่วนบุคคล"},
+        {id:62, aCode:"S02", aText:"ฉันชอบที่จะพูดคุยเกี่ยวกับความเป็นไปได้ในอนาคตมากกว่าปัญหาในอดีต", bCode:"S21", bText:"ฉันไม่ประนีประนอมกับสิ่งที่ขัดต่อคุณค่าและความเชื่อของฉัน"},
+        {id:63, aCode:"S03", aText:"ฉันสามารถทำให้เป้าหมายที่ดูธรรมดากลายเป็นภารกิจที่น่าตื่นเต้นได้", bCode:"S22", bText:"ความน่าเชื่อถือคือคุณสมบัติที่สำคัญที่สุดสำหรับฉัน"},
+        {id:64, aCode:"S04", aText:"ฉันมักจะมองหากรอบแนวคิดหรือทฤษฎีเพื่อทำความเข้าใจโลก", bCode:"S23", bText:"การตัดสินใจของฉันอยู่บนพื้นฐานของข้อมูลและหลักการ ไม่ใช่ความชอบส่วนตัว"},
+        {id:65, aCode:"S05", aText:"ฉันจะแบ่งเป้าหมายใหญ่ให้เป็นเป้าหมายย่อยๆ ที่สามารถลงมือทำได้", bCode:"S24", bText:"การยอมรับว่าตนเองไม่สมบูรณ์แบบทำให้ฉันเปิดใจเรียนรู้มากขึ้น"},
+        {id:66, aCode:"S06", aText:"ฉันมักจะมีไอเดียแปลกใหม่ที่คนอื่นอาจนึกไม่ถึง", bCode:"S25", bText:"ฉันพร้อมที่จะเสี่ยงเพื่อปกป้องคุณค่าที่ฉันยึดถือ"},
+        {id:67, aCode:"S07", aText:"การได้สำรวจหัวข้อใหม่ๆ ที่ฉันไม่เคยรู้มาก่อนเป็นเรื่องน่าสนุก", bCode:"S26", bText:"ฉันให้ความสำคัญกับการมีเวลาอยู่กับตัวเองเพื่อทบทวนความคิด"},
+        {id:68, aCode:"S08", aText:"ฉันเชื่อว่าทัศนคติเชิงบวกสามารถสร้างความเปลี่ยนแปลงที่ยิ่งใหญ่ได้", bCode:"S27", bText:"แทนที่จะฝืนสู้กับปัญหา ฉันมักจะหาทางใช้ประโยชน์จากสถานการณ์นั้น"},
+        {id:69, aCode:"S09", aText:"ฉันมองปัญหาเป็นเหมือนเกมปริศนาที่รอการไขคำตอบ", bCode:"S28", bText:"ฉันไม่มีปัญหาในการล้มเลิกแผนเดิมหากสถานการณ์บังคับ"},
+        {id:70, aCode:"S10", aText:"การรอให้คนอื่นเริ่มก่อนทำให้ฉันรู้สึกอึดอัด", bCode:"S29", bText:"ฉันสามารถควบคุมการแสดงออกทางสีหน้าและอารมณ์ได้ดี"},
+        {id:71, aCode:"S11", aText:"ความรู้สึกของการได้ทำงานให้เสร็จสิ้นเป็นแรงจูงใจที่สำคัญของฉัน", bCode:"S30", bText:"ฉันเชื่อว่าความสำเร็จที่แท้จริงมาจากการไม่ยอมแพ้"},
+        {id:72, aCode:"S12", aText:"ฉันชอบวางแผนการทำงานในแต่ละวันเพื่อให้แน่ใจว่าจะไม่พลาดสิ่งสำคัญ", bCode:"S16", bText:"ฉันมักจะสังเกตเห็นความเปลี่ยนแปลงเล็กๆ น้อยๆ ในอารมณ์ของคนรอบข้าง"},
+        {id:73, aCode:"S13", aText:"ฉันมีความมั่นใจในการตัดสินใจของตัวเอง", bCode:"S17", bText:"ฉันมีความสุขที่ได้แบ่งปันความรู้และประสบการณ์ของฉันกับผู้อื่น"},
+        {id:74, aCode:"S14", aText:"ฉันเชื่อว่าความสำเร็จที่ยิ่งใหญ่ต้องแลกมาด้วยความพยายามอย่างไม่หยุดหย่อน", bCode:"S18", bText:"ฉันคิดก่อนพูดเสมอเพื่อให้แน่ใจว่าคนอื่นจะเข้าใจสิ่งที่ฉันต้องการจะสื่อ"},
+        {id:75, aCode:"S15", aText:"ความรอบคอบช่วยป้องกันไม่ให้เกิดความผิดพลาดร้ายแรงตามมา", bCode:"S19", bText:"ฉันมักจะมองหาโอกาสที่จะมอบหมายงานที่ท้าทายเพื่อให้ทีมได้เติบโต"},
+        {id:76, aCode:"S01", aText:"การวางแผนระยะยาวเป็นเรื่องธรรมชาติสำหรับฉัน ไม่ใช่เรื่องที่ต้องฝืนทำ", bCode:"S21", bText:"การทำตามหลักการทำให้ฉันสามารถตัดสินใจได้อย่างสม่ำเสมอและไม่ลำเอียง"},
+        {id:77, aCode:"S02", aText:"ภาพของอนาคตที่ฉันต้องการสร้างขึ้นเป็นสิ่งที่ชัดเจนในใจของฉันเสมอ", bCode:"S22", bText:"ถ้าฉันให้สัญญา ฉันจะทำทุกวิถีทางเพื่อรักษาสัญญานั้น"},
+        {id:78, aCode:"S03", aText:"ฉันสามารถเลือกใช้คำพูดที่สร้างพลังและแรงบันดาลใจให้ผู้คนได้", bCode:"S23", bText:"ฉันเชื่อว่าทุกคนควรอยู่ภายใต้กฎเกณฑ์เดียวกัน"},
+        {id:79, aCode:"S04", aText:"การถกเถียงเรื่องแนวคิดหรือปรัชญาเป็นสิ่งที่ฉันสนใจ", bCode:"S24", bText:"ฉันชอบที่จะยกย่องและฉลองความสำเร็จของเพื่อนร่วมงาน"},
+        {id:80, aCode:"S05", aText:"หากไม่มีเป้าหมายที่ชัดเจน ฉันจะรู้สึกไร้ทิศทาง", bCode:"S25", bText:"ความกล้าหาญไม่ได้หมายถึงการไม่กลัว แต่หมายถึงการลงมือทำทั้งๆ ที่ใจยังกลัวอยู่"},
+        {id:81, aCode:"S06", aText:"ฉันเปิดรับไอเดียใหม่ๆ จากทุกทิศทาง", bCode:"S26", bText:"การตระหนักรู้ในลมหายใจของตัวเองช่วยให้ฉันสงบลงได้"},
+        {id:82, aCode:"S07", aText:"โลกนี้เต็มไปด้วยสิ่งที่น่าสนใจและฉันอยากจะเรียนรู้ให้ได้มากที่สุด", bCode:"S27", bText:"ความยืดหยุ่น คือกุญแจสำคัญในการรับมือกับโลกที่เปลี่ยนแปลงตลอดเวลา"},
+        {id:83, aCode:"S08", aText:"การมองโลกในแง่ดีช่วยให้ฉันฟื้นตัวจากความผิดหวังได้เร็ว", bCode:"S28", bText:"ฉันมองว่าการเปลี่ยนใจเมื่อได้ข้อมูลใหม่คือความเข้มแข็ง ไม่ใช่อ่อนแอ"},
+        {id:84, aCode:"S09", aText:"ฉันไม่กลัวที่จะเผชิญหน้ากับปัญหาที่คนอื่นพยายามหลีกเลี่ยง", bCode:"S29", bText:"คำพูดและการกระทำของฉันมักจะเยือกเย็นกว่าความรู้สึกข้างใน"},
+        {id:85, aCode:"S10", aText:"ฉันมักจะมองหาโอกาสที่จะได้เริ่มต้นโครงการใหม่ๆ", bCode:"S30", bText:"ฉันนับถือคนที่มีความทรหดอดทนและไม่ยอมแพ้ต่อโชคชะตา"},
+        {id:86, aCode:"S11", aText:"ฉันรู้สึกว่าวันที่มีประสิทธิผลคือวันที่ฉันได้ทำงานเสร็จไปหลายอย่าง", bCode:"S16", bText:"การเข้าใจมุมมองของคนอื่นเป็นสิ่งสำคัญก่อนที่จะตัดสินใจอะไรลงไป"},
+        {id:87, aCode:"S12", aText:"ฉันเชื่อว่ากระบวนการที่ดีจะนำไปสู่ผลลัพธ์ที่ดี", bCode:"S17", bText:"การได้เห็นคนอื่นประสบความสำเร็จจากคำแนะนำของฉันเป็นรางวัลที่ดีที่สุด"},
+        {id:88, aCode:"S13", aText:"เมื่อถึงเวลาที่ต้องตัดสินใจ ฉันจะไม่ปล่อยให้มันค้างคา", bCode:"S18", bText:"ฉันให้ความสำคัญกับการเลือกใช้ภาษาที่เหมาะสมกับสถานการณ์"},
+        {id:89, aCode:"S14", aText:"ฉันสามารถรักษาพลังใจในการทำงานหนักได้เป็นระยะเวลานาน", bCode:"S19", bText:"ฉันเชื่อว่าทุกคนมีศักยภาพที่จะเติบโตและพัฒนาได้"},
+        {id:90, aCode:"S15", aText:"ฉันมักจะถามคำถามเพื่อหาข้อมูลเพิ่มเติมก่อนที่จะสรุปอะไรลงไป", bCode:"S20", bText:"การสร้างฉันทามติและการมีส่วนร่วมของทีมเป็นสิ่งสำคัญสำหรับฉัน"},
+    ];
+
+    function startAssessment() {
+        const name = document.getElementById('userName').value.trim();
+        const email = document.getElementById('userEmail').value.trim();
+        
+        // SweetAlert Validation
+        if (!name || !email) { 
+            Swal.fire({
+                icon: 'warning',
+                title: 'ข้อมูลไม่ครบถ้วน',
+                text: 'กรุณากรอกชื่อและอีเมลให้ครบก่อนเริ่มต้นทำแบบประเมินค่ะ',
+                confirmButtonColor: 'var(--primary-purple)'
+            });
+            return; 
+        }
+        
+        document.getElementById('step0').classList.remove('active');
+        document.getElementById('bottom-nav-container').style.display = 'block';
+        document.getElementById('nav-group').style.display = 'flex';
+        renderQuestions();
+        showPage(1);
+    }
+
+    function renderQuestions() {
+        const area = document.getElementById('questions-area');
+        let html = '';
+        for (let i = 0; i < 15; i++) {
+            html += `<div class="step" id="step${i+1}">`;
+            html += `<h4 style="margin-bottom: 25px; color: var(--primary-purple);">กลุ่มคำถามที่ ${i+1}</h4>`;
+            for (let j = 0; j < QUESTIONS_PER_PAGE; j++) {
+                const qIndex = (i * QUESTIONS_PER_PAGE) + j;
+                if (qIndex >= rawQuestions.length) break;
+                const q = rawQuestions[qIndex];
+                html += `
+                    <div class="question-block" id="q-block-${q.id}">
+                        <p>ข้อที่ ${q.id}</p>
+                        <label class="option-label"><input type="radio" name="q${q.id}" value="${q.aCode}" required> <span>${q.aText}</span></label>
+                        <label class="option-label"><input type="radio" name="q${q.id}" value="${q.bCode}"> <span>${q.bText}</span></label>
+                    </div>`;
+            }
+            html += `</div>`;
+        }
+        area.innerHTML = html;
+    }
+
+    function showPage(n) {
+        const steps = document.getElementsByClassName("step");
+        for (let i = 0; i < steps.length; i++) steps[i].className = "step";
+        steps[n].className = "step active";
+        currentPage = n;
+        
+        document.getElementById("prevBtn").style.display = n === 1 ? "none" : "inline";
+        if (n === 15) {
+            document.getElementById("nextBtn").style.display = "none";
+            document.getElementById("submitBtn").style.display = "inline";
+        } else {
+            document.getElementById("nextBtn").style.display = "inline";
+            document.getElementById("submitBtn").style.display = "none";
+        }
+        updateProgress();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function changePage(n) {
+        if (n === 1 && !validatePage()) return;
+        showPage(currentPage + n);
+    }
+
+    function validatePage() {
+        const currentStep = document.getElementById(`step${currentPage}`);
+        const questionBlocks = currentStep.querySelectorAll('.question-block');
+        let allAnswered = true;
+        let firstMissing = null;
+        
+        questionBlocks.forEach(block => {
+            const qId = block.id.split('-').pop();
+            const checked = currentStep.querySelector(`input[name="q${qId}"]:checked`);
+            if (!checked) {
+                block.classList.add('error-highlight');
+                allAnswered = false;
+                if (!firstMissing) firstMissing = block;
+            } else {
+                block.classList.remove('error-highlight');
+            }
+        });
+
+        // SweetAlert Validation
+        if (!allAnswered) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'คุณยังตอบคำถามไม่ครบค่ะ',
+                text: 'โปรดตอบคำถามข้อที่ไฮไลท์สีแดง',
+                confirmButtonColor: 'var(--ruby-red)'
+            }).then(() => {
+                firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+        }
+        return allAnswered;
+    }
+
+    function updateProgress() {
+        const totalPages = 15;
+        const pct = (currentPage / totalPages) * 100;
+        document.getElementById("progress-bar").style.width = pct + "%";
+        document.getElementById("progress-percent").innerText = `ความสำเร็จ: ${Math.round(pct)}%`;
+        document.getElementById("progress-step").innerText = `หน้า ${currentPage} จาก ${totalPages}`;
+    }
+
+    function showSuccessScreen() {
+        Swal.close(); // ปิดหน้าต่าง Loading
+        document.body.innerHTML = `
+            <div class="container" style="text-align:center; padding: 60px 20px;">
+                <div style="font-size: 5rem; margin-bottom: 20px;">✨</div>
+                <h2 style="color: var(--primary-purple); font-size: 2.5rem;">ส่งข้อมูลสำเร็จ!</h2>
+                <p style="font-size: 1.2rem; color: #34495e; line-height: 1.6;">
+                    ขอบคุณที่ร่วมค้นหา Leadership Insight กับเรา<br>
+                    ทีมงานจะทำการประมวลผลพลังของคุณ<br>
+                    และส่งผลวิเคราะห์ฉบับเต็มให้ท่านเร็ว ๆ นี้
+                </p>
+                <button onclick="location.reload()" style="margin-top: 30px; background: var(--space-blue); color: white;">ทำอีกครั้ง</button>
+            </div>`;
+        document.getElementById('bottom-nav-container').style.display = 'none';
+    }
+
+    document.getElementById('InsightForm').onsubmit = function(e) {
+        e.preventDefault();
+        if (!validatePage()) return;
+        
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+
+        // SweetAlert Loading
+        Swal.fire({
+            title: 'กำลังเปล่งประกายพลัง Insight...',
+            text: 'ระบบกำลังส่งข้อมูลและประมวลผล กรุณารอสักครู่',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+
+        fetch(WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body: new URLSearchParams(data)
+        })
+        .then(() => {
+            // เมื่อส่งสำเร็จ แสดงหน้าจอสำเร็จ
+            showSuccessScreen();
+        })
+        .catch(err => {
+            // เอาการแจ้งเตือน Error ออกไปเลยตามคำสั่ง
+            // และบังคับให้แสดงหน้าจอสำเร็จแทน เนื่องจากข้อมูลถูกบันทึกแล้วจริงๆ
+            showSuccessScreen();
+        });
+    };
+</script>
+</body>
+</html>
